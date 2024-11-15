@@ -80,7 +80,6 @@ jobs:
     name: Create Release
     runs-on: ubuntu-latest
     needs: generate-appimage
-    if: ${{ needs.generate-appimage.outputs.is_update == 'true' }}
     steps:
       - name: Download tar.gz, AppImage, and AppImage.zsync
         uses: actions/download-artifact@v4
