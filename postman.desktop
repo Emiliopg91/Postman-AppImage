@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name={name}
+GenericName={name}
+X-AppImage-Version={version}
+Comment=Supercharge your API workflow.
+Exec={entrypoint}
+Icon={icon}
+Categories=Network;Development;
+StartupNotify=true
+Keywords=postman;Postman;
