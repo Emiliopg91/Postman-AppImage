@@ -1,8 +1,7 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name={name}
-GenericName={name}
+Name=Postman
 X-AppImage-Version={version}
 Comment=Supercharge your API workflow.
 Exec={entrypoint}
