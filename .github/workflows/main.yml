@@ -35,20 +35,8 @@ jobs:
         run: |
           tar -xzvf ./binaries.tar.gz
 
-      - name: Get version
-        id: get_version
-        run: |
-          version=$(cat ./Postman/app/resources/app/package.json | jq -r  .version)
-          echo "version=$version" >> $GITHUB_ENV
-
       - name: Generate AppImage
-        uses: Emiliopg91/AppImage-Creator@1.1.7
-        with: 
-          entrypoint: "./Postman/app/postman"
-          name: "Postman" 
-          version: "${{ env.version }}"
-          icon: "./Postman/app/resources/app/assets/icon.png"
-          desktop: "./postman.desktop"
+        uses: Emiliopg91/AppImage-Creator@1.2.0
         
       - name: Consolidate output
         id: consolidate_output
