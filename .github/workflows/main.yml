@@ -1,4 +1,4 @@
-name: Package & release Postman AppImage
+name: Package & release AppImage
 
 on:
   schedule:
@@ -13,62 +13,40 @@ permissions:
 
 jobs:
   generate-appimage:
-    name: Generate AppImage
+    name: Generate and publish AppImage
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.consolidate_output.outputs.version }}  # Definir la salida de la versión
-      is_update: ${{ steps.consolidate_output.outputs.is_update }}  # Exportar IS_UPDATE como output
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         
       - name: Download latest binaries
         run: |
-          wget -O binaries.tar.gz "https://dl.pstmn.io/download/latest/linux_64"
-          
-      - uses: actions/upload-artifact@v4
-        with:
-          name: app-binaries
-          path: binaries.tar.gz
+          binariesurl=$(cat app.desktop | grep Binaries-Url)
+          IFS="=" read -r name url <<< "$binariesurl"
+          wget -q -O binaries.tar.gz $url
 
       - name: Unpack binaries
         run: |
-          tar -xzvf ./binaries.tar.gz
+          tar -xzf ./binaries.tar.gz
 
       - name: Generate AppImage
-        uses: Emiliopg91/AppImage-Creator@1.2.0
-        
-      - name: Consolidate output
-        id: consolidate_output
-        run: |
-          echo "is_update=${{ env.IS_UPDATE }}" >> $GITHUB_OUTPUT
-          echo "version=${{ env.APP_VERSION }}" >> $GITHUB_OUTPUT
+        id: generate-appimage-file
+        uses: Emiliopg91/AppImage-Creator@latest      
 
-  create-release:
-    name: Create Release
-    runs-on: ubuntu-latest
-    needs: generate-appimage
-    if: ${{ needs.generate-appimage.outputs.is_update == 'true' }}
-    steps:    
-      - name: Download tar.gz, AppImage, and AppImage.zsync
-        uses: actions/download-artifact@v4
-        with:
-          name: app-binaries
-          path: .
-          
-      - name: Download AppImage and zsync files
-        uses: actions/download-artifact@v4
-        with:
-          name: appimage-files
-          path: .
+      - name: Rename binaries
+        run: mv binaries.tar.gz binaries-${{ env.APP_VERSION }}.tar.gz
 
       - name: Create GitHub Release
         id: create_release
+        if: env.IS_UPDATE == 'true'
         uses: marvinpinto/action-automatic-releases@latest
         with:
-          title: "${{ needs.generate-appimage.outputs.version }}"
-          automatic_release_tag: latest
+          title: ${{ env.APP_VERSION }}
+          automatic_release_tag: ${{ env.APP_VERSION }}
           prerelease: false
           files: |
-            ./*
+            binaries-${{ env.APP_VERSION }}.tar.gz
+            ${{ env.APPIMAGE_PATH }}
+            ${{ env.APPIMAGE_PATH }}.zsync
+            
           repo_token: ${{ secrets.GITHUB_TOKEN }}
