@@ -14,3 +14,4 @@ Keywords=postman;Postman;
 Entrypoint=./Postman/app/postman
 Icon=./Postman/app/resources/app/assets/icon.png
 Version-Cmd=cat ./Postman/app/resources/app/package.json | jq -r  .version
+Binaries-Url=https://dl.pstmn.io/download/latest/linux_64
